@@ -77,7 +77,7 @@ void SSD1306::Refresh(){
 #if defined(__MSP430G2553__)
     for (i=0; i < 256; i+=128){
 #else
-    for (i=0; i < 1024; i+=128)
+    for (i=0; i < 1024; i+=128){
 #endif
         i2c_master_write_reg(my_i2c_addr, 0x40, data + i, 128);
     }
@@ -100,7 +100,7 @@ void SSD1306::Refresh(oled_partition_t line){
 #if defined(__MSP430G2553__)
     for (i=0; i < 256; i+=128){
 #else
-    for (i=0; i < 1024; i+=128)
+    for (i=0; i < 1024; i+=128) {
 #endif
         i2c_master_write_reg(my_i2c_addr, 0x40, data + i, 128);
     }

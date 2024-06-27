@@ -7,13 +7,13 @@
  *
  *      - OLED thermo hygrometer using MSP430, DTH22 and SSD1306 OLED display
  *
- *           OLED SSD1306              MSP430F247
+ *           OLED SSD1306              MSP430G2553
  *             +-------+           +-------------------+
- *             |    SDA|<  -|---+->|P3.1/UCB0SDA       |
+ *             |    SDA|<  -|---+->|P1.7/UCB0SDA       |
  *             |       |    |      |                   |         DHT22
  *             |       |    |      |                   |       +-------+
  *             |       |    |      |                   |       |       |
- *             |    SCL|<----+-----|P3.2/UCB0SCL   P2.0| <---> |DQ     |
+ *             |    SCL|<----+-----|P1.6/UCB0SCL   P2.0| <---> |DQ     |
  *              -------            |                   |       +-------+
  *
  */
@@ -31,10 +31,12 @@
 /* Project classes includes */
 #include "SSD1306.h"
 #include "Dht22.h"
+#include "Battery.h"
 
 #define CLOCK_16MHz
 #define OLED_I2C_ADDRESS   0x3C
 
+#define LED_DEBUG
 #define LED_PIN BIT0
 #define LED_PORT P1
 
@@ -121,20 +123,32 @@ void config_wd_as_timer(){
 
 /* OLED SSD1306 class instance: allocate RAM in bss section */
 SSD1306 my_oled(OLED_I2C_ADDRESS);
+/* bool guard to wait for oled display during power-on */
+bool startup_delay = true;
+
+/* DHT22 class instance: allocate RAM in bss section */
 Dht22 my_temp_sensor;
+
+Battery my_battery;
+
 
 int main(void)
 {
     /* Desliga Watchdog */
     WDTCTL = WDTPW | WDTHOLD;
 
+#ifdef LED_DEBUG
     /* Debug LED */
     SET_BIT(PORT_DIR(LED_PORT), LED_PIN);
     SET_BIT(PORT_OUT(LED_PORT), LED_PIN);
+#endif
     /* Low level system initialization */
     init_clock_system();
     init_i2c_master_mode();
     config_wd_as_timer();
+
+    /* Sleep for one wd cycle to wait for OLED display */
+    __bis_SR_register(LPM0_bits + GIE);
 
     /* Init OLED display AFTER i2c initializaion  */
     my_oled.Init();
@@ -148,9 +162,11 @@ int main(void)
     uint16_t humi = 0;
     uint8_t checksum_valid;
     uint8_t digits[3];
+    uint16_t voltage = 0;
 
     while (1){
         checksum_valid = my_temp_sensor.dht_response();
+        voltage = my_battery.get_voltage();
 
         if (checksum_valid){
             temp =  my_temp_sensor.get_temp();
@@ -195,8 +211,21 @@ int main(void)
         my_oled.WriteScaledChar(64,0, '.', 2);
         my_oled.WriteScaledChar(80,0, '0' + digits[2] ,2);
         my_oled.WriteScaledChar(96,0, '%', 2);
-
         my_oled.Refresh(SSD1306::LINE_3);
+
+        for (int i=1; i >= 0; i--){
+            digits[i] = voltage % 10;
+            voltage = voltage / 10;
+        }
+        my_oled.ClearFrameBuffer();
+        my_oled.WriteScaledChar(40, 8, 'b',1);
+        my_oled.WriteScaledChar(48, 8, ':',1);
+        my_oled.WriteScaledChar(56, 8, '0' + digits[0],1);
+        my_oled.WriteScaledChar(64, 8, '.',1);
+        my_oled.WriteScaledChar(72, 8, '0' + digits[1],1);
+        my_oled.WriteScaledChar(80, 8, 'V',1);
+        my_oled.Refresh(SSD1306::LINE_4);
+
 
         __bis_SR_register(LPM0_bits + GIE);
     }
@@ -218,8 +247,15 @@ void __attribute__ ((interrupt(WDT_VECTOR))) watchdog_timer (void)
 {
     static uint16_t x = 0;
 
+    if (startup_delay) {
+        startup_delay = false;
+        __bic_SR_register_on_exit(CPUOFF);
+    }
+
     if (x >= 10) {
+#ifdef LED_DEBUG
         CPL_BIT(PORT_OUT(LED_PORT),LED_PIN);
+#endif
         x = 0;
         __bic_SR_register_on_exit(CPUOFF);
     }
