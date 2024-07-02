@@ -3727,16 +3727,16 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x04_Socket")
-		(at 260.35 39.37 0)
+		(at 260.35 41.91 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "266ae736-2165-44fc-9b6b-cd25531ce029")
 		(property "Reference" "J2"
-			(at 261.62 39.3699 0)
+			(at 261.62 41.9101 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3745,7 +3745,7 @@
 			)
 		)
 		(property "Value" "Conn_01x04_Socket"
-			(at 261.62 41.9099 0)
+			(at 261.62 39.3701 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3754,7 +3754,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
-			(at 260.35 39.37 0)
+			(at 260.35 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3763,7 +3763,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 260.35 39.37 0)
+			(at 260.35 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3772,7 +3772,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated"
-			(at 260.35 39.37 0)
+			(at 260.35 41.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4491,15 +4491,15 @@
 	(symbol
 		(lib_id "Connector:Conn_01x03_Socket")
 		(at 257.81 133.35 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "79aa8a3f-219b-4949-a2a3-8667cb79bdad")
 		(property "Reference" "J3"
-			(at 259.08 132.0799 0)
+			(at 259.08 134.6201 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4508,7 +4508,7 @@
 			)
 		)
 		(property "Value" "Conn_01x03_Socket"
-			(at 259.08 134.6199 0)
+			(at 259.08 132.0801 0)
 			(effects
 				(font
 					(size 1.27 1.27)
